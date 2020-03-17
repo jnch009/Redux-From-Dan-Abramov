@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { combineReducers, createStore } from "redux";
+
 import "./styles.css";
-import { createStore, combineReducers } from "redux";
 
 export const addCounter = list => {
   return [...list, 0];
@@ -64,9 +65,41 @@ const todoApp = combineReducers({
 let nextTodoID = 0;
 export default function CounterList() {
   const store = createStore(todoApp);
+  const FilterLink = ({ filter, children, visiblityFilter }) => {
+    if (filter === visiblityFilter) {
+      return <span>{children}</span>;
+    }
+
+    return (
+      <a
+        href="#"
+        onClick={e => {
+          e.preventDefault();
+          store.dispatch({ type: "SET_VISIBILITY_FILTER", filter });
+        }}
+      >
+        {children}
+      </a>
+    );
+  };
+
+  const getVisibleTodos = (todos, filter) => {
+    switch (filter) {
+      case "SHOW_ALL":
+        return todos;
+      case "SHOW_ACTIVE":
+        return todos.filter(t => !t.completed);
+      case "SHOW_COMPLETED":
+        return todos.filter(t => t.completed);
+      default:
+        return todos;
+    }
+  };
 
   class TodoApp extends React.Component {
     render() {
+      const { todos, visiblityFilter } = this.props;
+      const visibleTodos = getVisibleTodos(todos, visiblityFilter);
       return (
         <div>
           <input
@@ -87,10 +120,38 @@ export default function CounterList() {
             Add TODO
           </button>
           <ul>
-            {this.props.todos.map(todo => (
-              <li key={todo.id}>{todo.text}</li>
+            {visibleTodos.map(todo => (
+              <li
+                key={todo.id}
+                onClick={() => {
+                  store.dispatch({
+                    type: "TOGGLE_TODO",
+                    id: todo.id
+                  });
+                }}
+                style={{
+                  textDecoration: todo.completed ? "line-through" : "none"
+                }}
+              >
+                {todo.text}
+              </li>
             ))}
           </ul>
+          <p>
+            Show:{" "}
+            <FilterLink filter="SHOW_ALL" visiblityFilter={visiblityFilter}>
+              All
+            </FilterLink>{" "}
+            <FilterLink filter="SHOW_ACTIVE" visiblityFilter={visiblityFilter}>
+              Active
+            </FilterLink>{" "}
+            <FilterLink
+              filter="SHOW_COMPLETED"
+              visiblityFilter={visiblityFilter}
+            >
+              Completed
+            </FilterLink>
+          </p>
         </div>
       );
     }
@@ -98,7 +159,7 @@ export default function CounterList() {
 
   const renderListTodo = () => {
     ReactDOM.render(
-      <TodoApp todos={store.getState().todos} />,
+      <TodoApp {...store.getState()} />,
       document.getElementById("root")
     );
   };
