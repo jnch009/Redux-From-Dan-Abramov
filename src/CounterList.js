@@ -78,6 +78,30 @@ const getVisibleTodos = (todos, filter) => {
 let nextTodoID = 0;
 export default function CounterList() {
   const store = createStore(todoApp);
+  const AddTodo = () => {
+    let input;
+    return (
+      <div>
+        <input
+          ref={node => {
+            input = node;
+          }}
+        />
+        <button
+          onClick={() => {
+            store.dispatch({
+              type: "ADD_TODO",
+              id: nextTodoID++,
+              text: input.value
+            });
+            input.value = "";
+          }}
+        >
+          Add TODO
+        </button>
+      </div>
+    );
+  };
 
   // we need round brackets to define a functional component
   // the arguments need to be wrapped in curly braces for destructuring
@@ -105,26 +129,34 @@ export default function CounterList() {
     </ul>
   );
 
-  const AddTodo = ({ onAddClick }) => {
-    let input;
-    return (
-      <div>
-        <input
-          ref={node => {
-            input = node;
-          }}
+  class VisibleTodoList extends React.Component {
+    componentDidMount() {
+      this.unsubscribe = store.subscribe(() => {
+        this.forceUpdate();
+      });
+    }
+
+    componentWillUnmount() {
+      this.unsubscribe();
+    }
+
+    render() {
+      const props = this.props;
+      const state = store.getState();
+
+      return (
+        <TodoList
+          todos={getVisibleTodos(state.todos, state.visiblityFilter)}
+          onTodoClick={id =>
+            store.dispatch({
+              type: "TOGGLE_TODO",
+              id
+            })
+          }
         />
-        <button
-          onClick={() => {
-            onAddClick(input.value);
-            input.value = "";
-          }}
-        >
-          Add TODO
-        </button>
-      </div>
-    );
-  };
+      );
+    }
+  }
 
   // Presentational Component
   const Link = ({ active, children, onClick }) => {
@@ -175,42 +207,21 @@ export default function CounterList() {
 
   const Footer = () => (
     <p>
-      Show: <FilterLink filter="SHOW_ALL">All</FilterLink>{" "}
-      <FilterLink filter="SHOW_ACTIVE">Active</FilterLink>{" "}
+      Show: <FilterLink filter="SHOW_ALL">All</FilterLink>
+      {", "}
+      <FilterLink filter="SHOW_ACTIVE">Active</FilterLink>
+      {", "}
       <FilterLink filter="SHOW_COMPLETED">Completed</FilterLink>
     </p>
   );
 
-  const TodoApp = ({ todos, visiblityFilter }) => (
+  const TodoApp = () => (
     <div>
-      <AddTodo
-        onAddClick={text =>
-          store.dispatch({
-            type: "ADD_TODO",
-            id: nextTodoID++,
-            text
-          })
-        }
-      />
-      <TodoList
-        todos={getVisibleTodos(todos, visiblityFilter)}
-        onTodoClick={id =>
-          store.dispatch({
-            type: "TOGGLE_TODO",
-            id
-          })
-        }
-      />
+      <AddTodo />
+      <VisibleTodoList />
       <Footer />
     </div>
   );
 
-  const renderListTodo = () => {
-    ReactDOM.render(
-      <TodoApp {...store.getState()} />,
-      document.getElementById("root")
-    );
-  };
-  store.subscribe(renderListTodo);
-  renderListTodo();
+  ReactDOM.render(<TodoApp />, document.getElementById("root"));
 }
