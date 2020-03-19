@@ -133,7 +133,13 @@ export default function CounterList() {
     }
 
     return (
-      <a href="#" onClick={() => onClick(filter)}>
+      <a
+        href="#"
+        onClick={e => {
+          e.preventDefault();
+          onClick(filter);
+        }}
+      >
         {children}
       </a>
     );
