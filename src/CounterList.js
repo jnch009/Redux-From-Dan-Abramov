@@ -126,49 +126,58 @@ export default function CounterList() {
     );
   };
 
-  // Passing children as a prop is the stuff that is inside the component
-  const FilterLink = ({ filter, children, currentFilter, onClick }) => {
-    if (filter === currentFilter) {
+  // Presentational Component
+  const Link = ({ active, children, onClick }) => {
+    if (active) {
       return <span>{children}</span>;
     }
 
     return (
-      <a
-        href="#"
-        onClick={e => {
-          e.preventDefault();
-          onClick(filter);
-        }}
-      >
+      <a href="#" onClick={onClick}>
         {children}
       </a>
     );
   };
 
-  const Footer = ({ visiblityFilter, onFilterClick }) => (
+  // Passing 'children' as a prop is the stuff that is inside the component
+  // Container Component
+  class FilterLink extends React.Component {
+    //Need to subscribe to the store to get the latest state
+    //forceUpdate will force the component to re-render when store changes
+    componentDidMount() {
+      this.unsubscribe = store.subscribe(() => {
+        this.forceUpdate();
+      });
+    }
+
+    componentWillUnmount() {
+      this.unsubscribe();
+    }
+
+    render() {
+      const props = this.props;
+      const state = store.getState();
+
+      return (
+        <Link
+          active={props.filter === state.visiblityFilter}
+          onClick={() => {
+            store.dispatch({
+              type: "SET_VISIBILITY_FILTER",
+              filter: props.filter
+            });
+          }}
+          children={props.children}
+        />
+      );
+    }
+  }
+
+  const Footer = () => (
     <p>
-      Show:{" "}
-      <FilterLink
-        filter="SHOW_ALL"
-        currentFilter={visiblityFilter}
-        onClick={onFilterClick}
-      >
-        All
-      </FilterLink>{" "}
-      <FilterLink
-        filter="SHOW_ACTIVE"
-        currentFilter={visiblityFilter}
-        onClick={onFilterClick}
-      >
-        Active
-      </FilterLink>{" "}
-      <FilterLink
-        filter="SHOW_COMPLETED"
-        currentFilter={visiblityFilter}
-        onClick={onFilterClick}
-      >
-        Completed
-      </FilterLink>
+      Show: <FilterLink filter="SHOW_ALL">All</FilterLink>{" "}
+      <FilterLink filter="SHOW_ACTIVE">Active</FilterLink>{" "}
+      <FilterLink filter="SHOW_COMPLETED">Completed</FilterLink>
     </p>
   );
 
@@ -192,15 +201,7 @@ export default function CounterList() {
           })
         }
       />
-      <Footer
-        visiblityFilter={visiblityFilter}
-        onFilterClick={filter =>
-          store.dispatch({
-            type: "SET_VISIBILITY_FILTER",
-            filter
-          })
-        }
-      />
+      <Footer />
     </div>
   );
 
