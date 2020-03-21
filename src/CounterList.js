@@ -5,6 +5,29 @@ import { combineReducers, createStore } from "redux";
 
 import "./styles.css";
 
+let nextTodoID = 0;
+const addTodo = text => {
+  return {
+    type: "ADD_TODO",
+    id: nextTodoID++,
+    text
+  };
+};
+
+const visibleTodo = id => {
+  return {
+    type: "TOGGLE_TODO",
+    id
+  };
+};
+
+const setFilter = filter => {
+  return {
+    type: "SET_VISIBILITY_FILTER",
+    filter
+  };
+};
+
 export const addCounter = list => {
   return [...list, 0];
 };
@@ -76,7 +99,6 @@ const getVisibleTodos = (todos, filter) => {
   }
 };
 
-let nextTodoID = 0;
 export default function CounterList() {
   let AddTodo = ({ dispatch }) => {
     let input;
@@ -89,11 +111,7 @@ export default function CounterList() {
         />
         <button
           onClick={() => {
-            dispatch({
-              type: "ADD_TODO",
-              id: nextTodoID++,
-              text: input.value
-            });
+            dispatch(addTodo(input.value));
             input.value = "";
           }}
         >
@@ -131,25 +149,21 @@ export default function CounterList() {
   );
 
   //subscribes to the store
-  const mapStateToProps = state => {
+  const mapVisibleTodoStateToProps = state => {
     return {
       todos: getVisibleTodos(state.todos, state.visiblityFilter)
     };
   };
 
-  const mapDispatchToProps = dispatch => {
+  const mapVisibleTodoDispatchToProps = dispatch => {
     return {
-      onTodoClick: id =>
-        dispatch({
-          type: "TOGGLE_TODO",
-          id
-        })
+      onTodoClick: id => dispatch(visibleTodo(id))
     };
   };
 
   const VisibleTodoList = connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapVisibleTodoStateToProps,
+    mapVisibleTodoDispatchToProps
   )(TodoList);
 
   // Presentational Component
@@ -175,11 +189,7 @@ export default function CounterList() {
 
   const mapFilterLinkDispatchToProps = (dispatch, ownProps) => {
     return {
-      onClick: () =>
-        dispatch({
-          type: "SET_VISIBILITY_FILTER",
-          filter: ownProps.filter
-        })
+      onClick: () => dispatch(setFilter(ownProps.filter))
     };
   };
 
