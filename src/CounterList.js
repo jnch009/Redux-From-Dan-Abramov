@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
+import { connect, Provider } from "react-redux";
 import { combineReducers, createStore } from "redux";
 
 import "./styles.css";
@@ -78,7 +79,7 @@ const getVisibleTodos = (todos, filter) => {
 
 let nextTodoID = 0;
 export default function CounterList() {
-  const AddTodo = (props, { store }) => {
+  let AddTodo = ({ dispatch }) => {
     let input;
     return (
       <div>
@@ -89,7 +90,7 @@ export default function CounterList() {
         />
         <button
           onClick={() => {
-            store.dispatch({
+            dispatch({
               type: "ADD_TODO",
               id: nextTodoID++,
               text: input.value
@@ -102,9 +103,7 @@ export default function CounterList() {
       </div>
     );
   };
-  AddTodo.contextTypes = {
-    store: PropTypes.object
-  };
+  AddTodo = connect()(AddTodo);
 
   // we need round brackets to define a functional component
   // the arguments need to be wrapped in curly braces for destructuring
@@ -132,39 +131,27 @@ export default function CounterList() {
     </ul>
   );
 
-  class VisibleTodoList extends React.Component {
-    componentDidMount() {
-      const { store } = this.context;
-      this.unsubscribe = store.subscribe(() => {
-        this.forceUpdate();
-      });
-    }
-
-    componentWillUnmount() {
-      this.unsubscribe();
-    }
-
-    render() {
-      const props = this.props;
-      const { store } = this.context;
-      const state = store.getState();
-
-      return (
-        <TodoList
-          todos={getVisibleTodos(state.todos, state.visiblityFilter)}
-          onTodoClick={id =>
-            store.dispatch({
-              type: "TOGGLE_TODO",
-              id
-            })
-          }
-        />
-      );
-    }
-  }
-  VisibleTodoList.contextTypes = {
-    store: PropTypes.object
+  //subscribes to the store
+  const mapStateToProps = state => {
+    return {
+      todos: getVisibleTodos(state.todos, state.visiblityFilter)
+    };
   };
+
+  const mapDispatchToProps = dispatch => {
+    return {
+      onTodoClick: id =>
+        dispatch({
+          type: "TOGGLE_TODO",
+          id
+        })
+    };
+  };
+
+  const VisibleTodoList = connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(TodoList);
 
   // Presentational Component
   const Link = ({ active, children, onClick }) => {
@@ -179,44 +166,27 @@ export default function CounterList() {
     );
   };
 
-  // Passing 'children' as a prop is the stuff that is inside the component
-  // Container Component
-  class FilterLink extends React.Component {
-    //Need to subscribe to the store to get the latest state
-    //forceUpdate will force the component to re-render when store changes
-    componentDidMount() {
-      const { store } = this.context;
-      this.unsubscribe = store.subscribe(() => {
-        this.forceUpdate();
-      });
-    }
-
-    componentWillUnmount() {
-      this.unsubscribe();
-    }
-
-    render() {
-      const props = this.props;
-      const { store } = this.context;
-      const state = store.getState();
-
-      return (
-        <Link
-          active={props.filter === state.visiblityFilter}
-          onClick={() => {
-            store.dispatch({
-              type: "SET_VISIBILITY_FILTER",
-              filter: props.filter
-            });
-          }}
-          children={props.children}
-        />
-      );
-    }
-  }
-  FilterLink.contextTypes = {
-    store: PropTypes.object
+  const mapFilterLinkStateToProps = (state, ownProps) => {
+    return {
+      active: ownProps.filter === state.visiblityFilter,
+      children: ownProps.children
+    };
   };
+
+  const mapFilterLinkDispatchToProps = (dispatch, ownProps) => {
+    return {
+      onClick: () =>
+        dispatch({
+          type: "SET_VISIBILITY_FILTER",
+          filter: ownProps.filter
+        })
+    };
+  };
+
+  const FilterLink = connect(
+    mapFilterLinkStateToProps,
+    mapFilterLinkDispatchToProps
+  )(Link);
 
   const Footer = () => (
     <p>
@@ -228,21 +198,6 @@ export default function CounterList() {
     </p>
   );
 
-  class Provider extends React.Component {
-    getChildContext() {
-      return {
-        store: this.props.store
-      };
-    }
-
-    render() {
-      return this.props.children;
-    }
-  }
-  Provider.childContextTypes = {
-    store: PropTypes.object
-  };
-
   const TodoApp = () => (
     <div>
       <AddTodo />
@@ -251,8 +206,9 @@ export default function CounterList() {
     </div>
   );
 
+  const store = createStore(todoApp);
   ReactDOM.render(
-    <Provider store={createStore(todoApp)}>
+    <Provider store={store}>
       <TodoApp />
     </Provider>,
     document.getElementById("root")
