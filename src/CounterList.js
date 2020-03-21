@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
 import { connect, Provider } from "react-redux";
@@ -154,6 +153,7 @@ export default function CounterList() {
   )(TodoList);
 
   // Presentational Component
+  // children is simply what is inside the component
   const Link = ({ active, children, onClick }) => {
     if (active) {
       return <span>{children}</span>;
