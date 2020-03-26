@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 
-import { TodoApp } from "./components/presentational/presentationalTodoList";
+import TodoApp from "./components/presentational/presentationalTodoList";
 import todoApp from "./reducers/reducersTodoList";
 
 import "./styles.css";
