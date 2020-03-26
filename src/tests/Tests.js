@@ -6,7 +6,7 @@ import {
   toggleTodo,
   todo,
   todos
-} from "./CounterList";
+} from "../CounterList";
 
 const deepFreeze = require("deep-freeze");
 

@@ -5,8 +5,8 @@ import { createStore } from "redux";
 import expect from "expect";
 
 import { render } from "./Counter.js";
-import CounterList from "./CounterList";
-import TodoTests from "./Tests";
+import CounterList from "../CounterList";
+import TodoTests from "../tests/Tests";
 
 export default function App() {
   render();
