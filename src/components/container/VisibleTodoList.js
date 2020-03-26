@@ -16,16 +16,15 @@ const getVisibleTodos = (todos, filter) => {
 };
 
 //mapStateToProps subscribes to the store
-const mapVisibleTodoStateToProps = state => {
-  return {
-    todos: getVisibleTodos(state.todos, state.visiblityFilter)
-  };
-};
-const mapVisibleTodoDispatchToProps = dispatch => {
-  return {
-    onTodoClick: id => dispatch(visibleTodo(id))
-  };
-};
+const mapVisibleTodoStateToProps = state => ({
+  todos: getVisibleTodos(state.todos, state.visiblityFilter)
+});
+const mapVisibleTodoDispatchToProps = dispatch => ({
+  onTodoClick(id) {
+    dispatch(visibleTodo(id));
+  }
+});
+
 const VisibleTodoList = connect(
   mapVisibleTodoStateToProps,
   mapVisibleTodoDispatchToProps
