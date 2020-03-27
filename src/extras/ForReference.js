@@ -36,7 +36,7 @@
 // const todoApp = (state = {}, action) => {
 //   return {
 //     todos: todos(state.todos, action),
-//     visiblityFilter: visiblityFilter(state.visiblityFilter, action)
+//     visibilityFilter: visibilityFilter(state.visibilityFilter, action)
 //   };
 // };
 
@@ -51,7 +51,7 @@
 // };
 // const todoApp = combineReducersScratch({
 //   todos,
-//   visiblityFilter
+//   visibilityFilter
 // });
 
 // console.log(store.getState());

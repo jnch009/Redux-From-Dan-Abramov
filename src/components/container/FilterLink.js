@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Link from "../presentational/Link";
 
 const mapFilterLinkStateToProps = (state, ownProps) => ({
-  active: ownProps.filter === state.visiblityFilter,
+  active: ownProps.filter === state.visibilityFilter,
   children: ownProps.children
 });
 const mapFilterLinkDispatchToProps = (dispatch, ownProps) => ({

@@ -28,7 +28,7 @@ export const todos = (state = [], action) => {
 };
 
 // adding a new property
-const visiblityFilter = (state = "SHOW_ALL", action) => {
+const visibilityFilter = (state = "SHOW_ALL", action) => {
   switch (action.type) {
     case "SET_VISIBILITY_FILTER":
       return action.filter;
@@ -39,5 +39,5 @@ const visiblityFilter = (state = "SHOW_ALL", action) => {
 
 export default combineReducers({
   todos,
-  visiblityFilter
+  visibilityFilter
 });

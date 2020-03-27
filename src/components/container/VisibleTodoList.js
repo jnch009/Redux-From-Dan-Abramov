@@ -17,7 +17,7 @@ const getVisibleTodos = (todos, filter) => {
 
 //mapStateToProps subscribes to the store
 const mapVisibleTodoStateToProps = state => ({
-  todos: getVisibleTodos(state.todos, state.visiblityFilter)
+  todos: getVisibleTodos(state.todos, state.visibilityFilter)
 });
 const mapVisibleTodoDispatchToProps = dispatch => ({
   onTodoClick(id) {

@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
+import { loadState, saveState } from "./localStorage";
+import throttle from "lodash/throttle";
 
 import TodoApp from "./components/presentational/TodoApp";
 import todoApp from "./reducers/reducersTodoList";
@@ -17,10 +19,18 @@ export default function CounterList() {
   //       completed: true
   //     }
   //   ],
-  //   visiblityFilter: "SHOW_COMPLETED"
+  //   visibilityFilter: "SHOW_COMPLETED"
   // };
 
-  const store = createStore(todoApp);
+  const persistedState = loadState();
+  const store = createStore(todoApp, persistedState);
+
+  store.subscribe(
+    throttle(() => {
+      saveState({ todos: store.getState().todos });
+    }, 1000)
+  );
+
   console.log(store.getState());
   ReactDOM.render(
     <Provider store={store}>

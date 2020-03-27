@@ -1,10 +1,11 @@
-let nextTodoID = 0;
+import SID from "shortid";
+
 // wrapping inside brackets means an expression rather than a block
 // curly braces represent a block
 // here we've converted to an object
 const addTodo = text => ({
   type: "ADD_TODO",
-  id: nextTodoID++,
+  id: SID.generate(),
   text
 });
 
