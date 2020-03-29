@@ -1,7 +1,5 @@
-import { combineReducers } from "redux";
-
 //Reducer Composition with Arrays
-export const todo = (state, action) => {
+const todo = (state, action) => {
   switch (action.type) {
     case "ADD_TODO":
       return { id: action.id, text: action.text, completed: false };
@@ -16,7 +14,7 @@ export const todo = (state, action) => {
   }
 };
 
-export const todos = (state = [], action) => {
+const todos = (state = [], action) => {
   switch (action.type) {
     case "ADD_TODO":
       return [...state, todo(undefined, action)];
@@ -27,17 +25,4 @@ export const todos = (state = [], action) => {
   }
 };
 
-// adding a new property
-const visibilityFilter = (state = "SHOW_ALL", action) => {
-  switch (action.type) {
-    case "SET_VISIBILITY_FILTER":
-      return action.filter;
-    default:
-      return state;
-  }
-};
-
-export default combineReducers({
-  todos,
-  visibilityFilter
-});
+export default todos;
