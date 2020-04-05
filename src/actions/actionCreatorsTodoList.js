@@ -9,9 +9,15 @@ const addTodo = text => ({
   text
 });
 
-const visibleTodo = id => ({
+const toggleTodo = id => ({
   type: "TOGGLE_TODO",
   id
 });
 
-export { addTodo, visibleTodo };
+const receiveTodos = (filter, response) => ({
+  type: "RECEIVE_TODOS",
+  filter,
+  response
+});
+
+export { addTodo, toggleTodo, receiveTodos };
