@@ -1,3 +1,5 @@
+//Not needed but still interesting to know how to store/get from local storage
+
 export const loadState = () => {
   try {
     const serializedState = localStorage.getItem("state");
